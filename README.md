@@ -5,6 +5,12 @@
 
 A wrapper for the R package [blscrapeR](https://github.com/keberwein/blscrapeR) (available on CRAN as of this writing) intended to simplify downloading and saving data series. Where `bls_api()` will return only a range of years supported by a single call to the BLS' API (Up to 20 years for calls with a registered API key, and 10 years without one), `get_bls_data()` and `load_bls_data()` will return all data between two years, or all available data, in a single data frame. 
 
+## Installation
+
+```
+devtools::install_github("tomhopper/blscraperplus")
+```
+
 ## Example
 
 ```
