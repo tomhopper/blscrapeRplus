@@ -1,7 +1,7 @@
 Package: blscrapeRplus
 Type: Package
 Title: Provides an interface to blscrapeR::bls_api() that downloads all data between two years
-Version: 0.1.0
+Version: 1.0.0
 Author: Thomas Hopper
 Maintainer: Thomas Hopper <tomhopper@gmail.com>
 Description: Provides a wrapper for blscrapeR::bls_api() to simplify downloading and saving

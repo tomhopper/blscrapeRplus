@@ -23,8 +23,6 @@
 #' @seealso \code{\link{bls_api}}
 #'
 #' @export
-#  TODO: Check if bls_api() fails when startyear < earliest data series year. If so,
-#        then try again with startyear + 1, until startyear == endyear
 get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key = Sys.getenv("API_BLS_KEY")) {
   if(!missing(series_id)) {
     if((isTRUE(all.equal(length(api_key), 1L)) & is.character(api_key) | is.null(api_key))) {
@@ -114,6 +112,7 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
 #'                                       series_id = "CEU0000000001",
 #'                                       start_date = my_start_date)
 #'   }
+#  TODO: Add flag to delete old file and load new data
 load_bls_data <- function(file_name, series_id, start_year = NULL, end_year = NULL, api_key = Sys.getenv("API_BLS_KEY")) {
   if(missing(file_name) | missing(series_id)) stop("file_name and series_id are both required.")
   if("connection" %in% file_name | is.character(file_name))
