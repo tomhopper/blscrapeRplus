@@ -44,9 +44,9 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
         # 1) call bls_api()
         # 2) if nrow() == 0 or range[2] < start_year then return data frame
         # 3) else call get_bls_data() with parameters series_id, start_year = start_year_i-1 - increment
-        temp_df <- suppressWarnings({bls_api(seriesid = series_id,
+        temp_df <- bls_api(seriesid = series_id,
                            startyear = series_range[1], endyear = series_range[2],
-                           registrationKey = api_key)})
+                           registrationKey = api_key)
         # If bls_api() returned an empty data frame, we're done collecting data so
         # return the (empty) data frame, ending recursion.
         # Otherwise, recursively call this function with end_year decremented to get the next
@@ -55,9 +55,10 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
           return(temp_df)
         } else {
           end_year <- series_range[1]
+          # end_year <- series_range[1]
           # TODO: fix this if() so that it doesn't just automatically download the entire series
-          if(isTRUE(x = all.equal(target = start_year, current = end_year)))
-            start_year <- start_year - increment
+          if(isTRUE(all.equal(target = start_year, current = end_year)))
+            return(temp_df)
           return(temp_df %>% bind_rows(get_bls_data(series_id = series_id, start_year = start_year, end_year = end_year, api_key = api_key)) %>%
                    distinct() %>%
                    arrange(year, period))}
@@ -117,8 +118,10 @@ load_bls_data <- function(file_name, series_id, start_year = NULL, end_year = NU
   if(missing(file_name) | missing(series_id)) stop("file_name and series_id are both required.")
   if("connection" %in% file_name | is.character(file_name))
     if(file.exists(file_name)) {
+      message("Loading data from existing data file.")
       data_df <- readRDS(file_name)
     } else {
+      message("Downloading data from BLS.")
       data_df <- get_bls_data(series_id = series_id,
                               start_year = start_year,
                               end_year = end_year,
