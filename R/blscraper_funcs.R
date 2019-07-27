@@ -15,7 +15,7 @@
 #'   If \code{api_key} is \code{NULL}, \code{get_bls_data()} will set \code{increment = 10},
 #'   working within the 10-year limitation of the BLS API for unregistered users.
 #'
-#' @importFrom blscrapeR bls_api
+#' @importFrom blscrapeR bls_api dateCast
 #' @importFrom magrittr %>%
 #' @importFrom dplyr bind_rows distinct arrange
 #' @importFrom lubridate now year
@@ -44,19 +44,24 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
         # 3) else call get_bls_data() with parameters series_id, start_year = start_year_i-1 - increment
         temp_df <- bls_api(seriesid = series_id,
                            startyear = series_range[1], endyear = series_range[2],
-                           registrationKey = api_key)
+                           registrationKey = api_key) %>%
+          dateCast()
         # If bls_api() returned an empty data frame, we're done collecting data so
         # return the (empty) data frame, ending recursion.
         # Otherwise, recursively call this function with end_year decremented to get the next
         # batch of data.
         if(isTRUE(all.equal(nrow(temp_df), 0L))) {
+          ### EXIT Function #
           return(temp_df)
         } else {
           end_year <- series_range[1]
           # end_year <- series_range[1]
           # TODO: fix this if() so that it doesn't just automatically download the entire series
-          if(isTRUE(all.equal(target = start_year, current = end_year)))
+          if(isTRUE(all.equal(target = start_year, current = end_year))) {
+            ### EXIT Function #
             return(temp_df)
+          }
+          ### EXIT Recursive function call #
           return(temp_df %>% bind_rows(get_bls_data(series_id = series_id, start_year = start_year, end_year = end_year, api_key = api_key)) %>%
                    distinct() %>%
                    arrange(year, period))}
@@ -125,8 +130,6 @@ load_bls_data <- function(file_name, series_id, start_year = NULL, end_year = NU
                               start_year = start_year,
                               end_year = end_year,
                               api_key = api_key) %>%
-        mutate(Date = paste(year, .RIGHT(period, 2), "01", sep = "-")) %>%
-        mutate(Date = ymd(Date) + months(1) - days(1)) %>%
         distinct() %>%
         arrange(Date)
 

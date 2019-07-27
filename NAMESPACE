@@ -3,6 +3,7 @@
 export(get_bls_data)
 export(load_bls_data)
 importFrom(blscrapeR,bls_api)
+importFrom(blscrapeR,dateCast)
 importFrom(dplyr,arrange)
 importFrom(dplyr,bind_rows)
 importFrom(dplyr,distinct)
