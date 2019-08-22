@@ -23,7 +23,7 @@
 #' @seealso \code{\link{bls_api}}
 #'
 #' @export
-get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key = Sys.getenv("API_BLS_KEY")) {
+get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key = NULL) {
   if(!missing(series_id)) {
     if((isTRUE(all.equal(length(api_key), 1L)) & is.character(api_key) | is.null(api_key))) {
       if(isTRUE(all.equal(length(series_id), 1L))) {
@@ -78,13 +78,15 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
 
 #' @title load_bls_data
 #' @description Returns a data frame containing the specified Bureau of Labor Statistics data.
-#' @param file_name The path and filename of an R serial data (.RDS) file to use for loading
+#' @param file_name character. The path and filename of an R serial data (.RDS) file to use for loading
 #'   or saving data on disk.
-#' @param series_id The BLS series ID used to download data.
-#' @param start_year The first (earliest) year for which you want data for the \code{series_id}.
+#' @param series_id character. The BLS series ID used to download data.
+#' @param start_year numeric. The first (earliest) year for which you want data for the \code{series_id}.
 #'   If \code{NULL}, will attempt to pull the earliest available data.
-#' @param end_year The last (most recent) year for which you want data for the \code{series_id}.
+#' @param end_year numeric. The last (most recent) year for which you want data for the \code{series_id}.
 #'   If \code{NULL}, will pull the most recent data.
+#' @param fresh_start boolean. If true, will delete any existing data file specified by \code{file_name}
+#'   before proceeding to download new data from the specified series.
 #' @param api_key Your registred BLS API key, or \code{NULL} if you do not have a key.
 #' @return A data frame
 #'
@@ -92,7 +94,7 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
 #'   from disk and returned. If the file does not exist, the series ID is used to download the
 #'   data from the BLS. The data is then saved to the file \code{file_name}, and returned as
 #'   a data frame.
-#'   In addition to the data returned from the BLS's API, a new column \code{Date} is added,
+#'   In addition to the data returned from the BLS's API, a new column \code{date} is added,
 #'   with data class Date, and the data is sorted by date.
 #'   Both \code{file_name} and \code{series_id} should be passed as character strings, e.g.
 #'   \code{file_name = "data/jobs_u.rds", series_id = "CEU0000000001"}.
@@ -118,22 +120,30 @@ get_bls_data <- function(series_id, start_year = NULL, end_year = NULL, api_key 
 #'                                       start_date = my_start_date)
 #'   }
 #  TODO: Add flag to delete old file and load new data
-load_bls_data <- function(file_name, series_id, start_year = NULL, end_year = NULL, api_key = Sys.getenv("API_BLS_KEY")) {
+load_bls_data <- function(file_name, series_id, start_year = NULL, end_year = NULL, api_key = NULL, fresh_start = FALSE) {
   if(missing(file_name) | missing(series_id)) stop("file_name and series_id are both required.")
-  if("connection" %in% file_name | is.character(file_name))
+  if(is.character(file_name)) {
     if(file.exists(file_name)) {
-      message("Loading data from existing data file.")
-      data_df <- readRDS(file_name)
-    } else {
+      if(fresh_start) {
+        file.remove(file_name)
+      } else {
+        message("Loading data from existing data file.")
+        data_df <- readRDS(file_name)
+      }
+    }
+    if(!file.exists(file_name)) {
       message("Downloading data from BLS.")
       data_df <- get_bls_data(series_id = series_id,
                               start_year = start_year,
                               end_year = end_year,
                               api_key = api_key) %>%
         distinct() %>%
-        arrange(Date)
+        arrange(date)
 
       saveRDS(data_df, file = file_name)
     }
-  return(data_df)
+    return(data_df)
+  } else {
+    stop("file_name must be a character string containing the file name. See ?files for details on valid file names.")
+  }
 }

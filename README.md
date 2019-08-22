@@ -80,6 +80,9 @@ If we want to load newer data, we just delete the file.
 1.1.0
 : BREAKING CHANGE. Changed date conversion; date column is now named `date` instead of `Date`, and dates will be set to first of the month instead of end of the month.
 
+1.1.1
+: Fixed an error related to the change from "`Date`" to "`date`."
+
 ## A Note on Versioning
 
 Versions will be in the form: *X.Y.Z*
