@@ -83,6 +83,9 @@ If we want to load newer data, we just delete the file.
 1.1.1
 : Fixed an error related to the change from "`Date`" to "`date`."
 
+1.1.2
+: Updated DESCRIPTION and .gitignore to include the documentation when installing package from github with `devtools::install_github()`.
+
 ## A Note on Versioning
 
 Versions will be in the form: *X.Y.Z*
