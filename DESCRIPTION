@@ -14,8 +14,8 @@ Description: Provides a wrapper for blscrapeR::bls_api() to simplify downloading
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
 Imports: blscrapeR, dplyr, lubridate, magrittr
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+RoxygenNote: 7.2.3
